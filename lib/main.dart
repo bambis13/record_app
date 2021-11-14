@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:record/record.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,35 +32,52 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   bool _isRecording = false;
+  final recorder = Record();
 
-  void _switchRecordingState() {
+  Future<void> _switchRecording() async {
+    if (_isRecording) {
+      await recorder.stop();
+    } else {
+      await recorder.start(path: '/Users/akari/Downlods/record_app.mp4');
+    }
+    bool isRecording = await recorder.isRecording();
     setState(() {
-      _isRecording = !_isRecording;
+      _isRecording = isRecording;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initPermission();
+  }
+
+  void initPermission() async {
+    await Permission.microphone.request();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              _isRecording ? 'Recording' : 'Not Recording',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+        appBar: AppBar(
+          title: Text(widget.title),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _switchRecordingState,
-        tooltip: _isRecording ? 'stop' : 'start',
-        child: _isRecording ? const Icon(Icons.stop_rounded) : const Icon(Icons.fiber_manual_record)
-      )
-    );
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                _isRecording ? 'Recording' : 'Not Recording',
+                style: Theme.of(context).textTheme.headline4,
+              ),
+            ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+            onPressed: _switchRecording,
+            tooltip: _isRecording ? 'stop' : 'start',
+            child: _isRecording
+                ? const Icon(Icons.stop_rounded)
+                : const Icon(Icons.fiber_manual_record)));
   }
 }
