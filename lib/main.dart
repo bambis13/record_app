@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 
@@ -35,10 +38,14 @@ class _MyHomePageState extends State<MyHomePage> {
   final recorder = Record();
 
   Future<void> _switchRecording() async {
+    final appDirectory = (await getApplicationDocumentsDirectory()).path;
+    final recordsDirectory = '$appDirectory/records';
+
+    File(recordsDirectory).create(recursive: true);
     if (_isRecording) {
       await recorder.stop();
     } else {
-      await recorder.start(path: '/Users/akari/Downlods/record_app.mp4');
+      await recorder.start(path: '$recordsDirectory/record_app.mp4');
     }
     bool isRecording = await recorder.isRecording();
     setState(() {
