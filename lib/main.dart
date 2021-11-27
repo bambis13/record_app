@@ -61,10 +61,6 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       player.play();
     }
-    bool isPlaying = !_isPlaying;
-    setState(() {
-      _isPlaying = isPlaying;
-    });
   }
 
   @override
@@ -72,6 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     initPermission();
     initRecorder();
+    initPlayer();
   }
 
   void initPermission() async {
@@ -86,6 +83,14 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _recordsDirectory = recordsDirectory;
       _recordFilePath = _recordsDirectory + 'record_app.aac';
+    });
+  }
+
+  void initPlayer() async {
+    player.playerStateStream.listen((state) {
+      setState(() {
+        _isPlaying = state.playing;
+      });
     });
   }
 
