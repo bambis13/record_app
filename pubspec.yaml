@@ -36,6 +36,7 @@ dependencies:
   record: ^3.0.0
   permission_handler: ^8.2.6
   path_provider: ^2.0.6
+  just_audio: ^0.9.18
 
 dev_dependencies:
   flutter_test:

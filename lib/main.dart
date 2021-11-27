@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
@@ -39,6 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String _recordsDirectory = '';
   String _recordFilePath = '';
   final recorder = Record();
+  final player = AudioPlayer();
 
   Future<void> _switchRecording() async {
     if (_isRecording) {
@@ -53,6 +55,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _switchPlaying() async {
+    await player.setFilePath(_recordFilePath);
+    if (_isPlaying) {
+      await player.stop();
+    } else {
+      player.play();
+    }
     bool isPlaying = !_isPlaying;
     setState(() {
       _isPlaying = isPlaying;
