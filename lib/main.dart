@@ -39,13 +39,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _switchRecording() async {
     final appDirectory = (await getApplicationDocumentsDirectory()).path;
-    final recordsDirectory = '$appDirectory/records';
+    final recordsDirectory = '$appDirectory/records/';
+    const recordFile = 'record_app.aac';
+    print(recordsDirectory);
 
-    File(recordsDirectory).create(recursive: true);
+    await Directory(recordsDirectory).create(recursive: true);
     if (_isRecording) {
-      await recorder.stop();
+      final path = await recorder.stop();
+      print(path);
     } else {
-      await recorder.start(path: '$recordsDirectory/record_app.mp4');
+      await recorder.start(
+          path: recordsDirectory+recordFile, encoder: AudioEncoder.AAC);
     }
     bool isRecording = await recorder.isRecording();
     setState(() {
