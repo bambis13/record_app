@@ -35,21 +35,15 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   bool _isRecording = false;
+  String _recordsDirectory = '';
+  String _recordFilePath = '';
   final recorder = Record();
 
   Future<void> _switchRecording() async {
-    final appDirectory = (await getApplicationDocumentsDirectory()).path;
-    final recordsDirectory = '$appDirectory/records/';
-    const recordFile = 'record_app.aac';
-    print(recordsDirectory);
-
-    await Directory(recordsDirectory).create(recursive: true);
     if (_isRecording) {
-      final path = await recorder.stop();
-      print(path);
+      await recorder.stop();
     } else {
-      await recorder.start(
-          path: recordsDirectory+recordFile, encoder: AudioEncoder.AAC);
+      await recorder.start(path: _recordFilePath, encoder: AudioEncoder.AAC);
     }
     bool isRecording = await recorder.isRecording();
     setState(() {
@@ -61,10 +55,22 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     initPermission();
+    initRecorder();
   }
 
   void initPermission() async {
     await Permission.microphone.request();
+  }
+
+  void initRecorder() async {
+    final recordsDirectory =
+        (await getApplicationDocumentsDirectory()).path + '/records/';
+    await Directory(recordsDirectory).create(recursive: true);
+
+    setState(() {
+      _recordsDirectory = recordsDirectory;
+      _recordFilePath = _recordsDirectory + 'record_app.aac';
+    });
   }
 
   @override
@@ -84,8 +90,8 @@ class _MyHomePageState extends State<MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text(
-                _isRecording ? 'Recording' : 'Not Recording',
-                style: Theme.of(context).textTheme.headline4,
+                _isRecording ? 'Recording' : _recordFilePath,
+                style: Theme.of(context).textTheme.headline6,
               ),
             ],
           ),
