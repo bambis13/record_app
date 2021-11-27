@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -41,6 +42,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String _recordFilePath = '';
   final recorder = Record();
   final player = AudioPlayer();
+  late StreamSubscription<PlayerState> _playerStateSubscription;
 
   Future<void> _switchRecording() async {
     if (_isRecording) {
@@ -87,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void initPlayer() async {
-    player.playerStateStream.listen((state) {
+    _playerStateSubscription = player.playerStateStream.listen((state) {
       setState(() {
         _isPlaying = state.playing;
       });
@@ -98,6 +100,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void dispose() {
     super.dispose();
     recorder.dispose();
+    player.dispose();
+    _playerStateSubscription.cancel();
   }
 
   @override
