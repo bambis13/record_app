@@ -35,6 +35,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   bool _isRecording = false;
+  bool _isPlaying = false;
   String _recordsDirectory = '';
   String _recordFilePath = '';
   final recorder = Record();
@@ -48,6 +49,13 @@ class _MyHomePageState extends State<MyHomePage> {
     bool isRecording = await recorder.isRecording();
     setState(() {
       _isRecording = isRecording;
+    });
+  }
+
+  Future<void> _switchPlaying() async {
+    bool isPlaying = !_isPlaying;
+    setState(() {
+      _isPlaying = isPlaying;
     });
   }
 
@@ -93,6 +101,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 _isRecording ? 'Recording' : _recordFilePath,
                 style: Theme.of(context).textTheme.headline6,
               ),
+              TextButton(
+                onPressed: _switchPlaying, 
+                child: _isPlaying ? const Text('stop') : const Text('play'))
             ],
           ),
         ),
