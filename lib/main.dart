@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -42,13 +43,19 @@ class _MyHomePageState extends State<MyHomePage> {
   String _recordFilePath = '';
   final recorder = Record();
   final player = AudioPlayer();
+  final _dateFormat = DateFormat('yyyy-MM-dd-hhmmss');
   late StreamSubscription<PlayerState> _playerStateSubscription;
 
   Future<void> _switchRecording() async {
     if (_isRecording) {
       await recorder.stop();
     } else {
-      await recorder.start(path: _recordFilePath, encoder: AudioEncoder.AAC);
+      String fileName = _dateFormat.format(DateTime.now());
+      String recordFilePath = _recordsDirectory + fileName + '.aac';
+      await recorder.start(path: recordFilePath, encoder: AudioEncoder.AAC);
+      setState(() {
+        _recordFilePath = recordFilePath;
+      });
     }
     bool isRecording = await recorder.isRecording();
     setState(() {
@@ -84,7 +91,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
     setState(() {
       _recordsDirectory = recordsDirectory;
-      _recordFilePath = _recordsDirectory + 'record_app.aac';
     });
   }
 
@@ -119,8 +125,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 style: Theme.of(context).textTheme.headline6,
               ),
               TextButton(
-                onPressed: _switchPlaying, 
-                child: _isPlaying ? const Text('stop') : const Text('play'))
+                  onPressed: _switchPlaying,
+                  child: _isPlaying ? const Text('stop') : const Text('play'))
             ],
           ),
         ),
