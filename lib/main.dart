@@ -41,6 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _isPlaying = false;
   String _recordsDirectory = '';
   String _recordFilePath = '';
+  List<FileSystemEntity> _files = [];
   final recorder = Record();
   final player = AudioPlayer();
   final _dateFormat = DateFormat('yyyy-MM-dd-hhmmss');
@@ -49,6 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _switchRecording() async {
     if (_isRecording) {
       await recorder.stop();
+      _fetchFiles();
     } else {
       String fileName = _dateFormat.format(DateTime.now());
       String recordFilePath = _recordsDirectory + fileName + '.aac';
@@ -92,6 +94,8 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _recordsDirectory = recordsDirectory;
     });
+
+    _fetchFiles();
   }
 
   void initPlayer() async {
@@ -99,6 +103,13 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         _isPlaying = state.playing;
       });
+    });
+  }
+
+  void _fetchFiles() {
+    List<FileSystemEntity> files = Directory(_recordsDirectory).listSync();
+    setState(() {
+      _files = files;
     });
   }
 
@@ -120,8 +131,9 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              ..._files.map((e) => Text(e.path)),
               Text(
-                _isRecording ? 'Recording' : _recordFilePath,
+                _isRecording ? 'Recording' : '',
                 style: Theme.of(context).textTheme.headline6,
               ),
               TextButton(
